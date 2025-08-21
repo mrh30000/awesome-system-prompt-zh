@@ -1,0 +1,592 @@
+[
+  {
+    "toolSpecification": {
+      "description": "Execute the specified shell (CMD or Powershell) command.\n\n# Rules\n- Avoid using cli commands for search and discovery like cat, find, grep, ls, and instead use the grepSearch, fileSearch, readFile, and readMultipleFiles tools\n- Avoid using cli commands for file writing like mkdir or piping, instead using fsWrite (folders are managed for you)\n- NEVER use the 'cd' command! If you wish to run a command in a subdirectory of the workspace, provide the relative path in the 'path' parameter.\n- USING THE 'cd' command will result in a failure.\n",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "description": "Shell command to execute"
+            },
+            "path": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "string",
+                      "description": "Optional Path to run the command in, omit to run in workspace root"
+                    }
+                  ],
+                  "description": "Optional Path to run the command in, omit to run in workspace root"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional Path to run the command in, omit to run in workspace root"
+            }
+          },
+          "required": ["command"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "executePwsh"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "Tool for listing directory contents. Content is returned in the \"long format\" similar to `ls -la`.\n\nExample Usage:\n1. List the files in the home directory: path=\"~\"\n2. Recursively list files in a directory to a max depth of 2: path=\"/path/to/directory\", depth=2\n",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to directory, the path should be absolute, or otherwise start with ~ for the user's home. e.g. `repo`, `src`."
+            },
+            "explanation": {
+              "type": "string",
+              "description": "One sentence explanation as to why this tool is being used, and how it contributes to the goal."
+            },
+            "depth": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "number",
+                      "description": "Depth of a recursive directory listing (optional)"
+                    }
+                  ],
+                  "description": "Depth of a recursive directory listing (optional)"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Depth of a recursive directory listing (optional)"
+            }
+          },
+          "required": ["path", "explanation"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "listDirectory"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "Tool for reading a single file with optional line range specification. This tool reads the content of one file and can optionally limit the output to specific line ranges.\n\nExample Usage:\n- Read entire file: path=\"file.txt\"\n- Read specific lines: path=\"file.txt\", start_line=5, end_line=10\n- Read from line 5 to end: path=\"file.txt\", start_line=5\n- Read first 10 lines: path=\"file.txt\", end_line=10\n\nRules:\n1. Use line ranges to focus on relevant sections of large files only when absolutely necessary. Prefer reading entire files.\n2. For reading multiple files, use the readMultipleFiles tool instead\n",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to file to read, should be relative to workspace root. e.g. 'file.py' or 'src/main.ts'"
+            },
+            "start_line": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "number",
+                      "description": "Starting line number (optional).",
+                      "default": 1
+                    }
+                  ],
+                  "description": "Starting line number (optional)."
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Starting line number (optional)."
+            },
+            "end_line": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "number",
+                      "description": "Ending line number (optional).",
+                      "default": -1
+                    }
+                  ],
+                  "description": "Ending line number (optional)."
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ending line number (optional)."
+            },
+            "explanation": {
+              "type": "string",
+              "description": "One sentence explanation as to why this tool is being used, and how it contributes to the goal."
+            }
+          },
+          "required": ["path", "explanation"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "readFile"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "Tool for reading multiple files with optional line range specification. This tool reads the content of multiple files and can optionally limit the output to specific line ranges.\n\nExample Usage:\n- Read multiple files: paths=[\"file1.txt\", \"file2.txt\"]\n- Read specific lines from multiple files: paths=[\"file1.txt\", \"file2.txt\"], start_line=5, end_line=10\n- Read from line 5 to end: paths=[\"file1.txt\", \"file2.txt\"], start_line=5\n- Read first 10 lines: paths=[\"file1.txt\", \"file2.txt\"], end_line=10\n\nRules:\n1. Reading multiple files at once is preferred over multiple single-file reads\n2. Use line ranges to focus on relevant sections of large files only when absolutely necessary. Prefer reading entire files.\n3. For reading a single file, use the readFile tool instead\n",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Paths to files to read, should be relative to workspace root. e.g. ['file.py', 'src/main.ts']"
+            },
+            "start_line": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "number",
+                      "description": "Starting line number (optional). A negative index represents a line number starting from the end of the file.",
+                      "default": 1
+                    }
+                  ],
+                  "description": "Starting line number (optional). A negative index represents a line number starting from the end of the file."
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Starting line number (optional). A negative index represents a line number starting from the end of the file."
+            },
+            "end_line": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "number",
+                      "description": "Ending line number (optional). A negative index represents a line number starting from the end of the file.",
+                      "default": -1
+                    }
+                  ],
+                  "description": "Ending line number (optional). A negative index represents a line number starting from the end of the file."
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ending line number (optional). A negative index represents a line number starting from the end of the file."
+            },
+            "explanation": {
+              "type": "string",
+              "description": "One sentence explanation as to why this tool is being used, and how it contributes to the goal."
+            }
+          },
+          "required": ["paths", "explanation"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "readMultipleFiles"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "Fast file search based on fuzzy matching against file path. Use if you know part of the file path but don't know where it's located exactly. Response will be capped to 10 results. Make your query more specific if need to filter results further.",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "explanation": {
+              "type": "string",
+              "description": "Fuzzy filename to search for"
+            },
+            "query": {
+              "type": "string",
+              "description": "The regex pattern to search for"
+            },
+            "excludePattern": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "string",
+                      "description": "Glob pattern for files to exclude"
+                    }
+                  ],
+                  "description": "Glob pattern for files to exclude"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Glob pattern for files to exclude"
+            },
+            "includeIgnoredFiles": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "string",
+                      "description": "Whether the search should include .gitignore files, should be the string yes or no"
+                    }
+                  ],
+                  "description": "Whether the search should include .gitignore files, should be the string yes or no"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Whether the search should include .gitignore files, should be the string yes or no"
+            }
+          },
+          "required": ["explanation", "query"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "fileSearch"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "Fast text-based regex search that finds exact pattern matches within files or directories using ripgrep.\nSearch results include line numbers, file paths, and 2 lines of context around each match.\n\nParameters:\n- query (required): The regex pattern to search for. Use Rust regex syntax.\n- caseSensitive (optional): \"yes\" for case-sensitive search, \"no\" or omit for case-insensitive\n- includePattern (optional): Glob pattern for files to include (e.g. '*.ts', 'src/**/*.js'). If omitted, searches all files in workspace\n- excludePattern (optional): Glob pattern for files to exclude (e.g. '*.log', 'node_modules/**')\n- explanation (optional): Brief description of why this search is being performed\n\nSearch Behavior:\n- Use includePattern or excludePattern to filter the search scope by file type or specific paths. If no includePattern is specified, the tool will search all files.\n- The results are capped at 50 matches and long lines are truncated with \"[truncated: line too long]\" indicator.\n- If total output is too large, truncates with \"[truncated: too many matches]\" message.\n\nExamples of VALID patterns to use as \"query\":\n- Basic text search: \"function\", \"error\", \"TODO\"\n- Word boundaries: \"\\bword\\b\" (matches 'word' but not 'password')\n- Multiple words: \"auth.*failed\"\n- File content with spaces: \"not found\"\n- Line starts with: \"^import\"\n- Line ends with: \"};$\"\n- Numbers: \"\\d+\\.\\d+\" (finds decimal numbers like 3.14)\n- Word followed by another: \"function\\s+\\w+\" (finds function declarations)\n\nRules:\n1. Keep regex patterns simple. Complex patterns may fail.\n2. Use includePattern to narrow search scope for better performance\n3. Glob patterns: use standard glob syntax (* for wildcards, ** for recursive)\n4. NEVER use bash command \"grep\" to search but use this search tool instead because it is optimized for your machine.\n5. Always escape special regex characters: ( ) [ ] { } + * ? ^ $ | . \\\n6. You MUST use \\ to escape any of special regex characters when they appear in your search string.",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The regex pattern to search for"
+            },
+            "caseSensitive": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "boolean",
+                      "description": "Whether the search should be case sensitive"
+                    }
+                  ],
+                  "description": "Whether the search should be case sensitive"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Whether the search should be case sensitive"
+            },
+            "excludePattern": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "string",
+                      "description": "Glob pattern for files to exclude"
+                    }
+                  ],
+                  "description": "Glob pattern for files to exclude"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Glob pattern for files to exclude"
+            },
+            "explanation": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "string",
+                      "description": "One sentence explanation as to why this tool is being used, and how it contributes to the goal."
+                    }
+                  ],
+                  "description": "One sentence explanation as to why this tool is being used, and how it contributes to the goal."
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "One sentence explanation as to why this tool is being used, and how it contributes to the goal."
+            },
+            "includePattern": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "type": "string",
+                      "description": "Glob pattern for files to include (e.g. '*.ts' for TypeScript files)"
+                    }
+                  ],
+                  "description": "Glob pattern for files to include (e.g. '*.ts' for TypeScript files)"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Glob pattern for files to include (e.g. '*.ts' for TypeScript files)"
+            }
+          },
+          "required": ["query"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "grepSearch"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "Deletes a file at the specified path. The operation will fail gracefully if:\n    - The file doesn't exist\n    - The operation is rejected for security reasons\n    - The file cannot be deleted",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "explanation": {
+              "type": "string",
+              "description": "One sentence explanation as to why this tool is being used, and how it contributes to the goal."
+            },
+            "targetFile": {
+              "type": "string",
+              "description": "The path of the file to delete, relative to the workspace root."
+            }
+          },
+          "required": ["explanation", "targetFile"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "deleteFile"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "A tool for creating files, will override the file at `path` if it already exists as a file, and otherwise create a new file. If the content is larger than 50 lines, use create with part of the content and then use `fsAppend` to add more content.",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to file or directory, e.g. `file.py` or `repo`."
+            },
+            "text": {
+              "type": "string",
+              "description": "Contents to write into the file."
+            }
+          },
+          "required": ["path", "text"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "fsWrite"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "A tool for editing files, by adding content to the end of an existing file, automatically adding a newline if the file doesn't end with one. The file must exist.",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to file, e.g. `file.py` or `tst/my/file.test.ts`."
+            },
+            "text": {
+              "type": "string",
+              "description": "Contents to append to the end of the file."
+            }
+          },
+          "required": ["path", "text"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "fsAppend"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "A tool for replacing text in files. Especially useful for long files where much of the file will remain unchanged.\nParameters:\n- path: (required) the path to the file where replacements are requested.\n- oldStr (required)\n- newStr: (required)\n\nParameters Rules:\n- Each invoke must contain \"path\", \"oldStr\", and \"newStr\".\n- \"newStr\" should contain the edited lines that should replace the \"oldStr\".\n\nWhen making edits:\n- Ensure the edit results in idiomatic, correct code\n- Do not leave the code in a broken state\n- Ensure the path exists\n\nCRITICAL REQUIREMENTS FOR USING THIS TOOL:\n1. EXACT MATCHING: \"oldStr\" must match EXACTLY one or more consecutive lines from the file.\n2. WHITESPACES: All whitespace must match exactly (spaces, tabs, line endings). This is extra important in indentation-sensitive languages like Python.\nThe tool will fail if \"oldStr\" matches multiple locations or doesn't match exactly with the file content.\n3. UNIQUENESS: \"oldStr\" must uniquely identify a single instance in the file:\n   - Include sufficient context before and after the change point (2-3 lines recommended)\n   - If not unique, the replacement will not be performed\n4. REPLACEMENT: \"newStr\" should contain the edited lines that replace the \"oldStr\". These strings MUST BE DIFFERENT.\n5. PARALLEL TOOL CALLS: When performing multiple independent string replacements, invoke the 'strReplace' tool multiple times simultaneously in the same turn rather than sequentially. Prioritize calling this tool in parallel whenever possible.",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to file, e.g. `file.py` or `repo/file.js`."
+            },
+            "oldStr": {
+              "type": "string",
+              "description": "Required parameter containing the string in `path` to replace."
+            },
+            "newStr": {
+              "type": "string",
+              "description": "Required parameter containing the new string that will replace the `oldStr`."
+            }
+          },
+          "required": ["path", "oldStr", "newStr"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "strReplace"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "A detailed tool for dynamic and reflective problem-solving through thoughts.\nThis tool helps analyze problems through a flexible thinking process that can adapt and evolve.\nEach thought can build on, question, or revise previous insights as understanding deepens.\n\nWhen to use this tool:\n- Breaking down complex problems into steps\n- Planning and design with room for revision\n- Analysis that might need course correction\n- Problems where the full scope might not be clear initially\n- Problems that require a multi-step solution\n- Tasks that need to maintain context over multiple steps\n- Situations where irrelevant information needs to be filtered out\n\nKey features:\n- You can adjust total_thoughts up or down as you progress\n- You can question or revise previous thoughts\n- You can add more thoughts even after reaching what seemed like the end\n- You can express uncertainty and explore alternative approaches\n- Not every thought needs to build linearly - you can branch or backtrack\n- Generates a solution hypothesis\n- Verifies the hypothesis based on the Chain of Thought steps\n- Repeats the process until satisfied\n- Provides a correct answer\n\nParameters explained:\n- thought: Your current thinking step, which can include:\n* Regular analytical steps\n* Revisions of previous thoughts\n* Questions about previous decisions\n* Realizations about needing more analysis\n* Changes in approach\n* Hypothesis generation\n* Hypothesis verification\n- next_thought_needed: True if you need more thinking, even if at what seemed like the end\n- thought_number: Current number in sequence (can go beyond initial total if needed)\n- total_thoughts: Current estimate of thoughts needed (can be adjusted up/down)\n- is_revision: A boolean indicating if this thought revises previous thinking\n- revises_thought: If is_revision is true, which thought number is being reconsidered\n- branch_from_thought: If branching, which thought number is the branching point\n- branch_id: Identifier for the current branch (if any)\n- needs_more_thoughts: If reaching end but realizing more thoughts needed\n\nYou should:\n1. Start with an initial estimate of needed thoughts, but be ready to adjust\n2. Feel free to question or revise previous thoughts\n3. Don't hesitate to add more thoughts if needed, even at the \"end\"\n4. Express uncertainty when present\n5. Mark thoughts that revise previous thinking or branch into new paths\n6. Ignore information that is irrelevant to the current step\n7. Generate a solution hypothesis when appropriate\n8. Verify the hypothesis based on the Chain of Thought steps\n9. Repeat the process until satisfied with the solution\n10. Provide a single, ideally correct answer as the final output\n11. Only set next_thought_needed to false when truly done and a satisfactory answer is reached",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "thought": {
+              "type": "string",
+              "description": "Your current thinking step"
+            },
+            "nextThoughtNeeded": {
+              "type": "boolean",
+              "description": "Whether another thought step is needed"
+            },
+            "thoughtNumber": {
+              "type": "integer",
+              "description": "Current thought number",
+              "minimum": 1
+            },
+            "totalThoughts": {
+              "type": "integer",
+              "description": "Estimated total thoughts needed",
+              "minimum": 1
+            },
+            "isRevision": {
+              "type": "boolean",
+              "description": "Whether this revises previous thinking"
+            },
+            "revisesThought": {
+              "type": "integer",
+              "description": "Which thought is being reconsidered",
+              "minimum": 1
+            },
+            "branchFromThought": {
+              "type": "integer",
+              "description": "Branching point thought number",
+              "minimum": 1
+            },
+            "branchId": {
+              "type": "string",
+              "description": "Branch identifier"
+            },
+            "needsMoreThoughts": {
+              "type": "boolean",
+              "description": "If more thoughts are needed"
+            }
+          },
+          "required": [
+            "thought",
+            "nextThoughtNeeded",
+            "thoughtNumber",
+            "totalThoughts"
+          ]
+        }
+      },
+      "name": "mcp_sequential_thinking_sequentialthinking"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "Resolves a package/product name to a Context7-compatible library ID and returns a list of matching libraries.\n\nYou MUST call this function before 'get-library-docs' to obtain a valid Context7-compatible library ID UNLESS the user explicitly provides a library ID in the format '/org/project' or '/org/project/version' in their query.\n\nSelection Process:\n1. Analyze the query to understand what library/package the user is looking for\n2. Return the most relevant match based on:\n- Name similarity to the query (exact matches prioritized)\n- Description relevance to the query's intent\n- Documentation coverage (prioritize libraries with higher Code Snippet counts)\n- Trust score (consider libraries with scores of 7-10 more authoritative)\n\nResponse Format:\n- Return the selected library ID in a clearly marked section\n- Provide a brief explanation for why this library was chosen\n- If multiple good matches exist, acknowledge this but proceed with the most relevant one\n- If no good matches exist, clearly state this and suggest query refinements\n\nFor ambiguous queries, request clarification before proceeding with a best-guess match.",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "libraryName": {
+              "type": "string",
+              "description": "Library name to search for and retrieve a Context7-compatible library ID."
+            }
+          },
+          "required": ["libraryName"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "mcp_context7_resolve_library_id"
+    }
+  },
+  {
+    "toolSpecification": {
+      "description": "Fetches up-to-date documentation for a library. You must call 'resolve-library-id' first to obtain the exact Context7-compatible library ID required to use this tool, UNLESS the user explicitly provides a library ID in the format '/org/project' or '/org/project/version' in their query.",
+      "inputSchema": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "context7CompatibleLibraryID": {
+              "type": "string",
+              "description": "Exact Context7-compatible library ID (e.g., '/mongodb/docs', '/vercel/next.js', '/supabase/supabase', '/vercel/next.js/v14.3.0-canary.87') retrieved from 'resolve-library-id' or directly from user query in the format '/org/project' or '/org/project/version'."
+            },
+            "topic": {
+              "type": "string",
+              "description": "Topic to focus documentation on (e.g., 'hooks', 'routing')."
+            },
+            "tokens": {
+              "type": "number",
+              "description": "Maximum number of tokens of documentation to retrieve (default: 10000). Higher values provide more context but consume more tokens."
+            }
+          },
+          "required": ["context7CompatibleLibraryID"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      "name": "mcp_context7_get_library_docs"
+    }
+  }
+]

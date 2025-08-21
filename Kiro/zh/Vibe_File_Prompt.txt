@@ -1,0 +1,65 @@
+You are operating in a workspace with files and folders. Below is the known structure of the workspace. If a directory is marked closed, you can use the 'openFolders' tool to dig in deeper.
+
+<fileTree>
+<folder name='.git' closed />
+<folder name='.github' closed />
+<folder name='Cluely' >
+  <file name='Cluely\Default Prompt.txt' />
+  <file name='Cluely\Enterprise Prompt.txt' />
+</folder>
+<folder name='Cursor Prompts' >
+  <file name='Cursor Prompts\Agent CLI Prompt 2025-08-07.txt' />
+  <file name='Cursor Prompts\Agent Prompt v1.0.txt' />
+  <file name='Cursor Prompts\Agent Prompt v1.2.txt' />
+  <file name='Cursor Prompts\Agent Prompt.txt' />
+  <file name='Cursor Prompts\Agent Tools v1.0.json' />
+  <file name='Cursor Prompts\Chat Prompt.txt' />
+  <file name='Cursor Prompts\Memory Prompt.txt' />
+  <file name='Cursor Prompts\Memory Rating Prompt.txt' />
+</folder>
+<folder name='Devin AI' >
+  <file name='Devin AI\Prompt.txt' />
+</folder>
+<folder name='dia' >
+  <file name='dia\Prompt.txt' />
+</folder>
+<folder name='Junie' >
+  <file name='Junie\Prompt.txt' />
+</folder>
+<folder name='Kiro' >
+  <file name='Kiro\Mode_Clasifier_Prompt.txt' />
+  <file name='Kiro\Spec_Prompt.txt' />
+  <file name='Kiro\Vibe_Prompt.txt' />
+</folder>
+<file name='LICENSE.md' />
+<folder name='Lovable' >
+  <file name='Lovable\Agent Prompt.txt' />
+  <file name='Lovable\Agent Tools.json' />
+  <file name='Lovable\Prompt.txt' />
+</folder>
+<folder name='Manus Agent Tools & Prompt' >
+  <file name='Manus Agent Tools & Prompt\Agent loop.txt' />
+  <file name='Manus Agent Tools & Prompt\Modules.txt' />
+  <file name='Manus Agent Tools & Prompt\Prompt.txt' />
+  <file name='Manus Agent Tools & Prompt\tools.json' />
+</folder>
+<folder name='Open Source prompts' >
+  <folder name='Open Source prompts\Bolt' closed />
+  <folder name='Open Source prompts\Cline' closed />
+  <folder name='Open Source prompts\Codex CLI' closed />
+  <folder name='Open Source prompts\Lumo' closed />
+  <folder name='Open Source prompts\RooCode' closed />
+</folder>
+<folder name='Orchids.app' closed />
+<folder name='Perplexity' closed />
+<file name='README.md' />
+<folder name='Replit' closed />
+<folder name='Same.dev' closed />
+<folder name='Trae' closed />
+<folder name='v0 Prompts and Tools' closed />
+<folder name='VSCode Agent' closed />
+<folder name='Warp.dev' closed />
+<folder name='Windsurf' closed />
+<folder name='Xcode' closed />
+<folder name='Z.ai Code' closed />
+</fileTree>

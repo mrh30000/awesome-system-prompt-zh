@@ -1,0 +1,13 @@
+{user_input}
+
+<EnvironmentContext>
+This information is provided as context about user environment. Only consider it if it's relevant to the user request ignore it otherwise.
+
+<OPEN-EDITOR-FILES>
+No files are open
+</OPEN-EDITOR-FILES>
+
+<ACTIVE-EDITOR-FILE>
+No file is active in editor
+</ACTIVE-EDITOR-FILE>
+</EnvironmentContext>

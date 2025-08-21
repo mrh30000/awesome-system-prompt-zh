@@ -1,0 +1,16 @@
+# User Context
+
+## Work Environment
+
+Operating system: win32
+Workspace: d:\work\prompt\system-prompts-and-models-of-ai-tools
+Shell: powershell
+Current date: 2025/8/17
+Answer language: 中文
+This is your working environment, Ensure that all solutions are effective in this environment.
+
+
+
+# User Input
+
+你好

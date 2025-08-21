@@ -1,0 +1,13 @@
+{user_input}
+
+<EnvironmentContext>
+This information is provided as context about user environment. Only consider it if it's relevant to the user request ignore it otherwise.
+
+<OPEN-EDITOR-FILES>
+filepath/filename
+</OPEN-EDITOR-FILES>
+
+<ACTIVE-EDITOR-FILE>
+filepath/filename
+</ACTIVE-EDITOR-FILE>
+</EnvironmentContext>
